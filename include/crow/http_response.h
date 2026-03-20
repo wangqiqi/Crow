@@ -256,7 +256,10 @@ namespace crow
                 }
                 if (complete_request_handler_)
                 {
-                    complete_request_handler_();
+                    // CrowCpp#843: invoke a moved-out copy so complete_request()/prepare_buffers()
+                    // can clear res.complete_request_handler_ without destroying the running closure.
+                    auto handler = std::move(complete_request_handler_);
+                    handler();
                     manual_length_header = false;
                     skip_body = false;
                 }
